@@ -85,7 +85,7 @@ def GetJumpPoint(state, dx, dy, goal, cells):
       if X == goal[0] and y == goal[1]:
         return (X, y)
 
-  return jump(X, Y, dx, dy, goal, cells)
+  return GetJumpPoint(X, Y, dx, dy, goal, cells)
 
           
   
