@@ -50,3 +50,12 @@ def euclidDistance(
     dx, dy = abs(i1 - i2), abs(j1 - j2)
     
     return CHV*math.sqrt(dx*dx + dy*dy)
+
+def zeroDistance(
+    i1: int,
+    j1: int,
+    i2: int,
+    j2: int
+) -> float:
+    
+    return 0.

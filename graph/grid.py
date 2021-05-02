@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+
 class Map:
 
     def __init__(
-        self: Map,
+        self,
     ) -> None:
         
         self.width = 0
@@ -16,7 +17,7 @@ class Map:
         ]
     
     def readFromString(
-        self:    Map,
+        self,
         cellStr: str,
         width:   int,
         height:  int,
@@ -54,7 +55,7 @@ class Map:
         return self
                     
     def readFromCells(
-        self:      Map,
+        self,
         width:     int,
         height:    int,
         gridCells: list,
@@ -67,20 +68,20 @@ class Map:
         return self
         
     def inBounds(
-        self: Map,
-        i:    int,
-        j:    int,
+        self,
+        i:   int,
+        j:   int,
     ) -> bool:
         
         return 0 <= j < self.width and \
                0 <= i < self.height
     
     def traversable(
-        self: Map,
-        i:    int,
-        j:    int,
-        dx:   int,
-        dy:   int,
+        self,
+        i:   int,
+        j:   int,
+        dx:  int,
+        dy:  int,
     ) -> bool:
         
         if not self.inBounds(i + dx, j + dy):
@@ -99,17 +100,17 @@ class Map:
         return True
     
     def isObstacle(
-        self: Map,
-        i:    int,
-        j:    int,
+        self,
+        i:   int,
+        j:   int,
     ) -> bool:
         
         return self.cells[i][j]
     
     def getAllowedMovements(
-        self: Map,
-        i:    int,
-        j:    int,
+        self,
+        i:   int,
+        j:   int,
     ) -> list:
         
         neighbors = [

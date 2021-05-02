@@ -13,3 +13,22 @@ def makePath(
     path.append(current)
     
     return path[::-1], length
+
+def getLastEdge(
+    goal: Node,
+) -> tuple:
+    
+    current = goal
+    prev    = goal
+    
+    while current.parent:
+        prev = current
+        current = current.parent
+        
+    delta = (
+        prev.i - current.i,
+        prev.j - current.j,
+    )
+    
+    return delta
+        

@@ -1,6 +1,9 @@
 from __future__ import annotations
+from types import FunctionType
 
 from solver.base import BaseSolver
+from solver.pruning.base import BasePruning
+
 from graph.node import Node
 from graph.grid import Map
 
@@ -10,27 +13,30 @@ from solver.utils import getDirection
 class JPS(BaseSolver):
     
     def __init__(
-        self: JPS,
-        h_func,
-        *args,
+        self,
+        h_func: FunctionType,
+        prune:  BasePruning,
     ) -> JPS:
         
-        super().__init__(h_func)
+        super().__init__(h_func, prune)
         
     def getSuccessors(
-        self:  JPS,
+        self,
         state: Node,
         goal:  Node,
         grid:  Map,
         k:     int,
     ) -> list:
         
-        disallowed = self.getDisallowedDirections(state)
+        optimal = self.prune.getOptimalDirections(state, goal)
+        diallow = self.getDisallowedDirections(state)
+        
+        recommend = optimal - diallow
         
         successors = [
             self.getJumpPoint(state.i, state.j, delta[0], delta[1], goal, grid)
             for delta in grid.getAllowedMovements(state.i, state.j)
-            if delta not in disallowed
+            if delta in recommend
         ]
         
         nodes = [
@@ -48,9 +54,8 @@ class JPS(BaseSolver):
         return nodes
             
     def getDisallowedDirections(
-        self:  JPS,
+        self,
         state: Node,
-        *args,
     ) -> set:
         
         directions = set()
@@ -91,7 +96,7 @@ class JPS(BaseSolver):
         return directions
     
     def isDiagonalJumpPoint(
-        self: JPS,
+        self,
         i:    int,
         j:    int,
         dx:   int,
@@ -105,7 +110,7 @@ class JPS(BaseSolver):
         return up or down
     
     def isVerticalJumpPoint(
-        self: JPS,
+        self,
         i:    int,
         j:    int,
         dx:   int,
@@ -119,7 +124,7 @@ class JPS(BaseSolver):
         return up or down
     
     def isHorisontalJumpPoint(
-        self: JPS,
+        self,
         i:    int,
         j:    int,
         dx:   int,
@@ -133,7 +138,7 @@ class JPS(BaseSolver):
         return up or down
     
     def getJumpPoint(
-        self: JPS,
+        self,
         i:    int,
         j:    int,
         dx:   int,
@@ -199,3 +204,53 @@ class JPS(BaseSolver):
                 
                 if (x, base_y) == goal:
                     return (x, base_y)
+                
+    def getForsedDirections(
+        self,
+        iState: int,
+        jState: int,
+        dx:     int,
+        dy:     int,
+        grid:   Map,
+    ) -> list:
+        
+        forced = []
+        
+         #diag
+        if dx != 0 and dy != 0:
+            
+            for e_dx, e_dy in [(dx, 0), (0, dy)]:
+                
+                if grid.traversable(iState, jState, e_dx, e_dy):
+                    forced.append((e_dx, e_dy))
+                
+                f_dx = dx - 2*e_dx
+                f_dy = dy - 2*e_dy
+                
+                if not grid.traversable(iState, jState, -e_dx, -e_dy) \
+                   and grid.traversable(iState, jState, +f_dx, +f_dy):
+                    
+                    forced.append((f_dx, f_dy))
+                    
+        #horisontal
+        elif dx == 0:
+            
+            for e_dx in [1, -1]:
+                
+                if not grid.traversable(iState, jState, e_dx, +0) \
+                   and grid.traversable(iState, jState, e_dx, dy):
+                    
+                    forced.append((e_dx, dy))
+                    
+         #vertical
+        else:
+            
+            for e_dy in [1, -1]:
+                
+                if not grid.traversable(iState, jState, +0, e_dy) \
+                   and grid.traversable(iState, jState, dx, e_dy):
+                    
+                    forced.append((dx, e_dy))
+                    
+        return forced
+            
