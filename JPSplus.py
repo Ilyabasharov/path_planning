@@ -25,55 +25,55 @@ def GetJumpPoint(state, dx, dy, goal, cells):
   x, y = X, Y
 
   if X == goal[0] and Y == goal[1]:
-    return (X, Y)
+    return (X, Y), True
 
   if not traversable((X, Y), 0, 0, cells):
-    return None
+    return None, False
 
   if dx != 0 and dy != 0:
     while True:
       if CheckJumpPoint((x,y), dx, dy, cells):
-        return (x, y)
+        return (x, y), True
 
-      if (GetJumpPoint((x,y), dx, 0, goal, cells) is not None or GetJumpPoint((x,y), 0, dy, goal, cells) is not None):
-        return (x, y)
+      if (GetJumpPoint((x,y), dx, 0, goal, cells)[1] or GetJumpPoint((x,y), 0, dy, goal, cells)[1]):
+        return (x, y), True
 
       x += dx
       y += dy
 
       if x == goal[0] and y == goal[1]:
-        return (x, y)
+        return (x, y), True
 
       if not traversable((x,y), 0, 0, cells):
-        return (x-dx, y-dy)
+        return (x-dx, y-dy), False
 
       if cells[x - dx][y] == 1 and cells[x][y - dy] == 1:
-        return (x-dx, y-dy)
+        return (x-dx, y-dy), False
 
   elif dx != 0:
     while True:
       if CheckJumpPoint((x,Y), dx, 0, cells):
-        return (x, Y)
+        return (x, Y), True
 
       x += dx
 
       if not traversable((x,Y), 0, 0, cells):
-        return (x-dx, Y)
+        return (x-dx, Y), False
 
       if x == goal[0] and Y == goal[1]:
-        return (x, Y)
+        return (x, Y), True
   else:
     while True:
       if CheckJumpPoint((X,y), 0, dy, cells):
-        return (X, y)
+        return (X, y), True
 
       y += dy
 
       if not traversable((X,y), 0, 0, cells):
-        return (X, y-dy)
+        return (X, y-dy), False
 
       if X == goal[0] and y == goal[1]:
-        return (X, y)
+        return (X, y), True
 
   return GetJumpPoint(X, Y, dx, dy, goal, cells)
           
@@ -109,7 +109,7 @@ def ProcessMap(cells):
                 val = []
                 for d in delta:
                     dx, dy = d[0], d[1]
-                    jp = GetJumpPoint((i,j), dx, dy, (-100, -100), cells)
+                    jp = GetJumpPoint((i,j), dx, dy, (-100, -100), cells)[0]
                     val.append(jp)
                 proc_map[(i, j)] = val
     return proc_map
