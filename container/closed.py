@@ -6,8 +6,8 @@ from graph.node import Node
 class ClosedList(ClosedBase):
 
     def __init__(
-        self: ClosedList,
-    ) -> None:
+        self,
+    ) -> ClosedList:
         
         super().__init__()
         
@@ -15,19 +15,19 @@ class ClosedList(ClosedBase):
         self.elements_list = list()
 
     def __iter__(
-        self: ClosedList,
+        self,
     ) -> iter:
         
         return iter(self.elements_list)
     
     def __len__(
-        self: ClosedList,
+        self,
     ) -> int:
         
         return len(self.elements_list)
     
     def addNode(
-        self: ClosedList,
+        self,
         item: Node,
     ) -> None:
         
@@ -35,7 +35,7 @@ class ClosedList(ClosedBase):
         self.elements_list.append(item)
 
     def wasExpanded(
-        self: ClosedList,
+        self,
         item: Node,
     ) -> bool:
         

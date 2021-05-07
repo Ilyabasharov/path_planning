@@ -2,20 +2,15 @@ from __future__ import annotations
 from types import FunctionType
 
 from container.base import (
-    OpenBase,
-    ClosedBase,
+    OpenBase, ClosedBase,
 )
-
 from container.open import OpenList
 from container.closed import ClosedList
 
 from graph.node import Node
-from graph.grid import Map
+from graph.grid import GridMap
 
-from solver.pruning.base import (
-    BasePruning,
-    NoPruning,
-)
+from solver.pruning.base import BasePruning
 
 
 class BaseSolver:
@@ -29,11 +24,13 @@ class BaseSolver:
         self.h_func = h_func
         self.prune  = prune
         
+        self.preprocessed = False
+        
     def getSuccessors(
         self,
         current_state: Node,
         goal_state:    Node,
-        grid_map:      Map,
+        grid_map:      GridMap,
         **kwargs,
     ) -> list:
         
@@ -45,15 +42,25 @@ class BaseSolver:
         jState: int,
         dx:     int,
         dy:     int,
-        grid:   Map,
+        grid:   GridMap,
     ) -> list:
         
-        pass
+        return []
+    
+    def doPreprocess(
+        self,
+        grid: GridMap,
+    ) -> None:
+        
+        if not self.preprocessed:
+            self.prune.preprocess(self.getForsedDirections, grid)
+            
+        self.preprocessed = True
     
 
 def findPathBase(
     solver:     BaseSolver,
-    gridMap:    Map,
+    gridMap:    GridMap,
     startNode:  Node,
     goalNode:   Node,
     openType:   OpenBase   = OpenList,
@@ -81,11 +88,11 @@ def findPathBase(
                 
         k += 1
         
-    return (False, None, closedList, openList)
+    return False, None, closedList, openList
 
 
 def dijkstraFloodFill(
-    gridMap:    Map,
+    gridMap:    GridMap,
     start:      tuple,
     openType:   OpenBase   = OpenList,
     closedType: ClosedBase = ClosedList,

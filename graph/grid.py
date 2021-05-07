@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 
-class Map:
+class GridMap:
 
     def __init__(
         self,
-    ) -> None:
+    ) -> GridMap:
         
         self.width = 0
         self.height = 0
@@ -21,7 +21,7 @@ class Map:
         cellStr: str,
         width:   int,
         height:  int,
-    ) -> Map:
+    ) -> GridMap:
         
         self.width = width
         self.height = height
@@ -59,7 +59,7 @@ class Map:
         width:     int,
         height:    int,
         gridCells: list,
-    ) -> Map:
+    ) -> GridMap:
         
         self.width = width
         self.height = height

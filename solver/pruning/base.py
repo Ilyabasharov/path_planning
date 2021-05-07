@@ -1,7 +1,7 @@
 from __future__ import annotations
 from types import FunctionType
 
-from graph.grid import Map
+from graph.grid import GridMap
 from graph.node import Node
 
 
@@ -16,7 +16,7 @@ class BasePruning:
     def preprocess(
         self,
         forcedDirections: FunctionType,
-        grid: Map,
+        grid: GridMap,
     ) -> None:
         
         pass
@@ -41,7 +41,7 @@ class NoPruning(BasePruning):
     def preprocess(
         self,
         forcedDirections: FunctionType,
-        grid: Map,
+        grid: GridMap,
     ) -> None:
         
         self.allowed_directions = set(grid.deltas)

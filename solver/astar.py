@@ -4,10 +4,10 @@ from types import FunctionType
 from solver.base import BaseSolver
 from solver.pruning.base import BasePruning
 
+from graph.grid import GridMap
 from graph.node import Node
-from graph.grid import Map
 
-from solver.utils import getDirection
+from utils.utils import getDirection
 
 
 class AStar(BaseSolver):
@@ -24,7 +24,7 @@ class AStar(BaseSolver):
         self,
         state: Node,
         goal:  Node,
-        grid:  Map,
+        grid:  GridMap,
         k:     int,
     ) -> list:
         
@@ -43,14 +43,3 @@ class AStar(BaseSolver):
         ]
         
         return nodes
-    
-    def getForsedDirections(
-        self,
-        iState: int,
-        jState: int,
-        dx:     int,
-        dy:     int,
-        grid:   Map,
-    ) -> list:
-        
-        return []

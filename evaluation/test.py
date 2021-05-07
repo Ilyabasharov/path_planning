@@ -1,29 +1,27 @@
 import time
+import tqdm
 from types import FunctionType
 
-from solver.base import BaseSolver
-from solver.base import findPathBase
+from solver.base import BaseSolver, findPathBase
 from solver.pruning.base import BasePruning
 
-from graph.grid import Map
+from graph.grid import GridMap
 from graph.node import Node
-from container.base import (
-    OpenBase,
-    ClosedBase,
-)
 
+from container.base import (
+    OpenBase, ClosedBase,
+)
 from container.open import OpenList
 from container.closed import ClosedList
 
-from utils.path import makePath
 from utils.visualisation import drawResult
+from utils.path import makePath
 
 
 def simpleTest(
     solver:      BaseSolver,
-    pruning:     BasePruning,
     engine:      FunctionType,
-    grid:        Map,
+    grid:        GridMap,
     start:       Node,
     goal:        Node,
     open_list:   OpenBase   = OpenList,
@@ -37,9 +35,6 @@ def simpleTest(
         'length':  None,
         'created': 0,
     }
-    
-    if not pruning.preprocessed:
-        pruning.preprocess(solver.getForsedDirections, grid)
     
     start_time = time.time()
     
@@ -66,3 +61,23 @@ def simpleTest(
             drawResult(grid, start, goal, path, closed_list, open_list)
     
     return stats
+
+def massiveTest(
+    solver:      BaseSolver, 
+    tasks,
+    stringMap,
+    Hfunction, 
+    **args
+) -> list:
+    
+    allTasksResults = []
+    
+    for task in tqdm.tqdm(tasks):
+        width, height, jStart, iStart, jGoal, iGoal, optLenght = task
+        pathDiff, nNodes, nSteps, correct = SimpleTest(
+            SearchFunction, height, width, stringMap, iStart, jStart, iGoal, jGoal, optLenght, False, biderect, **args)
+        
+        allTasksResults.append((pathDiff, nNodes, nSteps, correct, optLenght))
+        
+
+    return allTasksResults

@@ -5,39 +5,39 @@ from graph.node import Node
 class OpenBase:
     
     def __init__(
-        self: OpenBase,
+        self,
         *args,
-    ) -> None:
+    ) -> OpenBase:
         
         pass
     
     def __iter__(
-        self: OpenBase,
+        self,
     ) -> iter:
         
         pass
     
     def __len__(
-        self: OpenBase,
+        self,
     ) -> int:
         
         pass
     
     def isEmpty(
-        self: OpenBase,
+        self,
     ) -> bool:
         
         return len(self) == 0
     
     def addNode(
-        self: OpenBase,
+        self,
         item: Node,
     ) -> None:
         
         pass
     
     def getBestNode(
-        self: OpenBase,
+        self,
     ) -> Node:
         
         pass
@@ -46,32 +46,32 @@ class OpenBase:
 class ClosedBase:
     
     def __init__(
-        self: ClosedBase,
-    ) -> None:
+        self,
+    ) -> ClosedBase:
         
         pass
     
     def __iter__(
-        self: ClosedBase,
+        self,
     ) -> iter:
         
         pass
     
     def __len__(
-        self: ClosedBase,
+        self,
     ) -> int:
         
         pass
     
     def addNode(
-        self: ClosedBase,
+        self,
         item: Node,
     ) -> None:
         
         pass
     
     def wasExpanded(
-        self: ClosedBase,
+        self,
         item: Node,
     ) -> bool:
         

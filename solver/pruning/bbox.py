@@ -8,7 +8,7 @@ from solver.pruning.base import BasePruning
 from solver.base import dijkstraFloodFill
 from utils.bbox import BoundingBox
 from utils.path import getLastEdge
-from graph.grid import Map
+from graph.grid import GridMap
 
 
 class BBoxPruning(BasePruning):
@@ -24,7 +24,7 @@ class BBoxPruning(BasePruning):
     def preprocess(
         self,
         forcedDirections: FunctionType,
-        grid:             Map,
+        grid:             GridMap,
     ) -> None:
         
         per_x, per_y = range(grid.height), range(grid.width)

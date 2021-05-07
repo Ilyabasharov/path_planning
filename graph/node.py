@@ -6,13 +6,13 @@ from utils.distance import euclidDistance
 class Node:
     
     def __init__(
-        self:   Node,
+        self,
         i:      int,
         j:      int,
-        h:      int,
+        h:      int  = 0,
         parent: Node = None,
         k:      int  = 0,
-    ) -> None:
+    ) -> Node:
         
         self.i = i
         self.j = j
@@ -29,7 +29,7 @@ class Node:
         self.parent = parent
     
     def __eq__(
-        self:  Node,
+        self,
         other: Node,
     ) -> bool:
         
@@ -42,7 +42,7 @@ class Node:
         
 
     def __lt__(
-        self:  Node,
+        self,
         other: Node,
     ) -> bool:
         

@@ -10,8 +10,8 @@ from graph.node import Node
 class OpenList(OpenBase):
     
     def __init__(
-        self: OpenList,
-    ) -> None:
+        self,
+    ) -> OpenList:
         
         super().__init__()
         
@@ -19,19 +19,19 @@ class OpenList(OpenBase):
         self.ij_to_node = {}
 
     def __iter__(
-        self: OpenList,
+        self,
     ) -> iter:
         
         return iter(self.ij_to_node.values())
 
     def __len__(
-        self: OpenList,
+        self,
     ) -> int:
         
         return len(self.ij_to_node)
 
     def addNode(
-        self: OpenList,
+        self,
         item: Node,
     ) -> None:
         
@@ -43,7 +43,7 @@ class OpenList(OpenBase):
             heappush(self.prioritizedQueue, item)
 
     def getBestNode(
-        self: OpenList,
+        self,
     ) -> Node:
         
         bestNode = heappop(self.prioritizedQueue)

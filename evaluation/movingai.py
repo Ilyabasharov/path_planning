@@ -1,47 +1,59 @@
+from __future__ import annotations
 import re
 
-def readMapFromMovingAIFile(
-    path: str,
-) -> tuple:
+class MovingAIDataset:
     
-    passable = re.compile('[%s]' % ''.join(s for s in ('G', '.', 'S')))
-    not_passable = re.compile('[%s]' % ''.join(s for s in ('O', '@', 'T', 'W')))
-    
-    with open(path, 'r') as file:
-        _ = file.readline()
-        height = int(file.readline().split('height ')[1])
-        width = int(file.readline().split('width ')[1])
-        _ = file.readline()
+    def __init__(
+        self,
+        path2map:   str,
+        path2tasks: str,
+    ) -> MovingAIDataset:
         
-        result = re.sub(
-            not_passable,
-            '#',
-            re.sub(
-                passable,
-                '.',
-                file.read()
-            ),
-        )
+        h, w, grid  = self.readMapFromFile(path2map)
+        self.tasks  = self.readTasksFromFile(path2tasks)
         
-    return height, width, result
+    def readMapFromFile(
+        self,
+        path: str,
+    ) -> tuple:
+        
+        passable = re.compile('[%s]' % ''.join(s for s in ('G', '.', 'S')))
+        not_passable = re.compile('[%s]' % ''.join(s for s in ('O', '@', 'T', 'W')))
 
-def readTasksFromMovingAIFile(
-    path: str,
-) -> list:
+        with open(path, 'r') as file:
+            _ = file.readline()
+            height = int(file.readline().split('height ')[1])
+            width = int(file.readline().split('width ')[1])
+            _ = file.readline()
+
+            grid = re.sub(
+                not_passable,
+                '#',
+                re.sub(
+                    passable,
+                    '.',
+                    file.read()
+                ),
+            )
+
+        return height, width, grid
     
-    tasks = []
-    with open(path, 'r') as file:
+    def readTasksFromFile(
+        self,
+        path: str,
+    ) -> list:
         
-        _ = file.readline()
+        tasks = []
         
-        for line in file:
+        with open(path, 'r') as file:
+        
+            _ = file.readline()
             
-            bucket, map_, width, height, jStart, iStart, jGoal, iGoal, optLenght = line.split()
-            tasks.append((
-                int(width), int(height),
-                int(jStart), int(iStart),
-                int(jGoal), int(iGoal),
-                float(optLenght),
-            ))
+            tasks = [
+                line.split()
+                for line in file
+            ]
         
-    return tasks
+                
+        return tasks
+    

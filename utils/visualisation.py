@@ -1,21 +1,19 @@
 import itertools
 from PIL import (
-    Image,
-    ImageDraw,
+    Image, ImageDraw,
 )
 from IPython.display import display
 
 from container.base import (
-    OpenBase,
-    ClosedBase,
+    OpenBase, ClosedBase,
 )
 
-from graph.grid import Map
 from graph.node import Node
+from graph.grid import GridMap
 
 
 def drawResult(
-    grid:        Map,
+    grid:        GridMap,
     start:       Node        = None,
     goal:        Node        = None,
     path:        list        = None,

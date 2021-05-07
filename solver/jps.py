@@ -4,10 +4,10 @@ from types import FunctionType
 from solver.base import BaseSolver
 from solver.pruning.base import BasePruning
 
+from graph.grid import GridMap
 from graph.node import Node
-from graph.grid import Map
 
-from solver.utils import getDirection
+from utils.utils import getDirection
 
 
 class JPS(BaseSolver):
@@ -24,8 +24,28 @@ class JPS(BaseSolver):
         self,
         state: Node,
         goal:  Node,
-        grid:  Map,
+        grid:  GridMap,
         k:     int,
+    ) -> list:
+        
+        nodes = [
+            Node(
+                i      = i,
+                j      = j,
+                h      = self.h_func(i, j, goal.i, goal.j),
+                parent = state,
+                k      = k,
+            )
+            for i, j in filter(None, self.filteredSuccessors(state, goal, grid))
+        ]
+        
+        return nodes
+    
+    def filteredSuccessors(
+        self,
+        state: Node,
+        goal:  Node,
+        grid:  GridMap,
     ) -> list:
         
         optimal = self.prune.getOptimalDirections(state, goal)
@@ -39,19 +59,7 @@ class JPS(BaseSolver):
             if delta in recommend
         ]
         
-        nodes = [
-            Node(
-                i      = successor[0],
-                j      = successor[1],
-                h      = self.h_func(successor[0], successor[1], goal.i, goal.j),
-                parent = state,
-                k      = k,
-            )
-            for successor in successors
-            if successor is not None
-        ]
-        
-        return nodes
+        return successors
             
     def getDisallowedDirections(
         self,
@@ -101,7 +109,7 @@ class JPS(BaseSolver):
         j:    int,
         dx:   int,
         dy:   int,
-        grid: Map,
+        grid: GridMap,
     ) -> bool:
         
         down = grid.traversable(i, j, -dx, +dy) and not grid.traversable(i, j, -dx,   0)
@@ -115,7 +123,7 @@ class JPS(BaseSolver):
         j:    int,
         dx:   int,
         dy:   int,
-        grid: Map,
+        grid: GridMap,
     ) -> bool:
         
         up   = grid.traversable(i, j, dx, +1) and not grid.traversable(i, j, 0, +1)
@@ -129,7 +137,7 @@ class JPS(BaseSolver):
         j:    int,
         dx:   int,
         dy:   int,
-        grid: Map,
+        grid: GridMap,
     ) -> bool:
         
         up   = grid.traversable(i, j, +1, dy) and not grid.traversable(i, j, +1, 0)
@@ -144,7 +152,7 @@ class JPS(BaseSolver):
         dx:   int,
         dy:   int,
         goal: Node,
-        grid: Map,
+        grid: GridMap,
     ) -> tuple:
         
         if not grid.traversable(i, j, dx, dy):
@@ -211,7 +219,7 @@ class JPS(BaseSolver):
         jState: int,
         dx:     int,
         dy:     int,
-        grid:   Map,
+        grid:   GridMap,
     ) -> list:
         
         forced = []
