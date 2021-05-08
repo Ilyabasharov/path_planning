@@ -27,8 +27,8 @@ def GetJumpPoint(state, dx, dy, goal, cells):
   if X == goal[0] and Y == goal[1]:
     return (X, Y), True
 
-  if not traversable((X, Y), 0, 0, cells):
-    return None, False
+  if not traversable((X, Y), 0, 0, cells) or cells[x - dx][y] == 1 and cells[x][y - dy] == 1:
+    return (x-dx, y-dy), False
 
   if dx != 0 and dy != 0:
     while True:
@@ -85,6 +85,9 @@ def traversable(state, dx, dy, cells):
   x = x0 + dx
   y = y0 + dy
 
+  if x0 < 0 or y0 < 0 or x0 >= cells.shape[0] or y0 >= cells.shape[1]:
+    return False
+
   if x < 0 or y < 0 or x >= cells.shape[0] or y >= cells.shape[1]:
     return False
 
@@ -114,28 +117,57 @@ def ProcessMap(cells):
                 proc_map[(i, j)] = val
     return proc_map
 
+def GetDirection(state, parent):
+  delta = [[0, 1], [1, 0], [0, -1], [-1, 0], [1, 1], [1, -1], [-1, 1], [-1, -1]]
+  dx = int(math.copysign(1, state[0] - parent[0]))
+  dy = int(math.copysign(1, state[1] - parent[1]))
+
+  if state[0] - parent[0] == 0:
+    dx = 0
+  
+  if state[1] - parent[1] == 0:
+    dy = 0
+  return delta.index([dx, dy]), (dx, dy)
 
 def GetSuccessors(state, parent, goal, cells, proc_map):
   successors = []
 
   neighbours = proc_map[state]
 
-  for s in neighbours:
-    if s is None:
+  for d, s in enumerate(neighbours):
+    if s is None or s == state:
         continue
+    
+    index = GetDirection(s, state)[0]
+    dx, dy = GetDirection(s, state)[1]
+    if dx != 0 and dy != 0:
+        if (s[0] - goal[0]) * (state[0] - goal[0]) <= 0: 
+          x = goal[0]
+          y = (goal[0] - state[0]) * dx * dy + state[1]
+          if traversable((x, y), 0, 0, cells) and traversable((x-dx, y-dy), dx, dy, cells):
+              successors.append((x, y))
 
-    if (s[0] - goal[0]) * (state[0] - goal[0]) <= 0 and (s[1] - goal[1]) * (state[1] - goal[1]) <= 0:
-        successors.append(goal)
-        break
+        if (s[1] - goal[1]) * (state[1] - goal[1]) <= 0: 
+            x = state[0] + (goal[1] - state[1]) * dx * dy
+            y = goal[1]
+            if traversable((x, y), 0, 0, cells) and traversable((x-dx, y-dy), dx, dy, cells):
+              successors.append((x, y))
 
-    if (s[0] - goal[0]) * (state[0] - goal[0]) <= 0:
-        successors.append((goal[0], s[1]))
+    if dx != 0 and dy == 0:
+        if (s[0] - goal[0]) * (state[0] - goal[0]) <= 0:
+          x = goal[0]
+          y = state[1]
+          if traversable((x, y), 0, 0, cells):
+              successors.append((x, y))
 
-    if (s[1] - goal[1]) * (state[1] - goal[1]) <= 0:
-        successors.append((s[0], goal[1]))
-
-    if  (s[0] - goal[0]) * (state[0] - goal[0]) > 0 and (s[1] - goal[1]) * (state[1] - goal[1]) > 0:
-        successors.append((s[0], s[1]))   
+    if dy != 0 and dx == 0:
+        if (s[1] - goal[1]) * (state[1] - goal[1]) <= 0: 
+          x = state[0]
+          y = goal[1]
+          if traversable((x, y), 0, 0, cells):
+              successors.append((x, y))
+    
+    successors.append((s[0], s[1]))
 
   return successors
 
