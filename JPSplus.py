@@ -101,6 +101,7 @@ def traversable(state, dx, dy, cells):
 
   return True
 
+
 def ProcessMap(cells):
     proc_map = {}
     delta = [[0, 1], [1, 0], [0, -1], [-1, 0], [1, 1], [1, -1], [-1, 1], [-1, -1]]
@@ -129,46 +130,96 @@ def GetDirection(state, parent):
     dy = 0
   return delta.index([dx, dy]), (dx, dy)
 
+def GetNeighbours(state, parent, proc_map):
+  delta = [[0, 1], [1, 0], [0, -1], [-1, 0], [1, 1], [1, -1], [-1, 1], [-1, -1]]
+  all_neighbours = proc_map[state]
+  neighbours = []
+  dx, dy = GetDirection(parent, state)[1]
+  if dx != 0 and dy != 0:
+      neighbours.append(all_neighbours[delta.index([-dx, -dy])])
+      neighbours.append(all_neighbours[delta.index([0, -dy])])
+      neighbours.append(all_neighbours[delta.index([-dx, 0])])
+
+  if dx != 0 and dy == 0:
+      neighbours.append(all_neighbours[delta.index([-dx, 0])])
+      neighbours.append(all_neighbours[delta.index([-dx, 1])])
+      neighbours.append(all_neighbours[delta.index([-dx, -1])])
+      neighbours.append(all_neighbours[delta.index([0, -1])])
+      neighbours.append(all_neighbours[delta.index([0, 1])])
+  
+  if dx == 0 and dy != 0:
+      neighbours.append(all_neighbours[delta.index([0, -dy])])
+      neighbours.append(all_neighbours[delta.index([1, -dy])])
+      neighbours.append(all_neighbours[delta.index([-1, -dy])])
+      neighbours.append(all_neighbours[delta.index([-1, 0])])
+      neighbours.append(all_neighbours[delta.index([1, 0])])
+
+  return neighbours
+  
+
 def GetSuccessors(state, parent, goal, cells, proc_map):
   successors = []
-
-  neighbours = proc_map[state]
-
+  if parent is not None:
+    neighbours = GetNeighbours(state, parent, proc_map)
+  else:
+    neighbours = proc_map[state]
+  
   for d, s in enumerate(neighbours):
     if s is None or s == state:
         continue
     
     index = GetDirection(s, state)[0]
     dx, dy = GetDirection(s, state)[1]
+
     if dx != 0 and dy != 0:
         if (s[0] - goal[0]) * (state[0] - goal[0]) <= 0: 
-          x = goal[0]
-          y = (goal[0] - state[0]) * dx * dy + state[1]
-          if traversable((x, y), 0, 0, cells) and traversable((x-dx, y-dy), dx, dy, cells):
-              successors.append((x, y))
-
-        if (s[1] - goal[1]) * (state[1] - goal[1]) <= 0: 
+            x = goal[0]
+            y = (goal[0] - state[0]) * dx * dy + state[1]
+            if (x,y) == goal:
+              successors.append(goal)
+              break
+            
+            if abs(proc_map[(x,y)][GetDirection(goal, (x,y))[0]][1] - y) >= abs(goal[1] - y):
+                successors.append((x, y))   
+                continue
+            
+        elif (s[1] - goal[1]) * (state[1] - goal[1]) <= 0: 
             x = state[0] + (goal[1] - state[1]) * dx * dy
             y = goal[1]
-            if traversable((x, y), 0, 0, cells) and traversable((x-dx, y-dy), dx, dy, cells):
-              successors.append((x, y))
-
+            if (x,y) == goal:
+              successors.append(goal)
+              break
+            
+            if abs(proc_map[(x,y)][GetDirection(goal, (x,y))[0]][0] - x) >= abs(goal[0] - x) :
+                successors.append((x, y))
+                continue             
+            
     if dx != 0 and dy == 0:
         if (s[0] - goal[0]) * (state[0] - goal[0]) <= 0:
-          x = goal[0]
-          y = state[1]
-          if traversable((x, y), 0, 0, cells):
-              successors.append((x, y))
-
+            x = goal[0]
+            y = state[1]
+            if (x,y) == goal:
+              successors.append(goal)
+              break
+            
+            if abs(proc_map[(x,y)][GetDirection(goal, (x,y))[0]][1] - y) >= abs(goal[1] - y) :
+                successors.append((x, y))
+                continue   
+            
     if dy != 0 and dx == 0:
         if (s[1] - goal[1]) * (state[1] - goal[1]) <= 0: 
-          x = state[0]
-          y = goal[1]
-          if traversable((x, y), 0, 0, cells):
-              successors.append((x, y))
-    
+            x = state[0]
+            y = goal[1]
+            if (x,y) == goal:
+              successors.append(goal)
+              break
+            
+            if abs(proc_map[(x,y)][GetDirection(goal, (x,y))[0]][0] - x) >= abs(goal[0] - x):
+                successors.append((x, y))
+                continue
+     
     successors.append((s[0], s[1]))
-
+    
   return successors
 
 def JPSplus(gridMap : Map, iStart : int, jStart : int, iGoal : int, jGoal : int, *args, heuristicFunction = DiagonalDistance):
