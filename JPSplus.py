@@ -137,6 +137,9 @@ def GetNeighbours(state, parent, proc_map):
   dx, dy = GetDirection(parent, state)[1]
   if dx != 0 and dy != 0:
       neighbours.append(all_neighbours[delta.index([-dx, -dy])])
+      neighbours.append(all_neighbours[delta.index([dx, -dy])])
+      neighbours.append(all_neighbours[delta.index([-dx, dy])])
+
       neighbours.append(all_neighbours[delta.index([0, -dy])])
       neighbours.append(all_neighbours[delta.index([-dx, 0])])
 
@@ -183,7 +186,7 @@ def GetSuccessors(state, parent, goal, cells, proc_map):
             
             if abs(proc_map[(x,y)][GetDirection(goal, (x,y))[0]][1] - y) >= abs(goal[1] - y):
                 successors.append((x, y))   
-                continue
+      #          continue
             
         if (s[1] - goal[1]) * (state[1] - goal[1]) <= 0: 
             x = state[0] + (goal[1] - state[1]) * dx * dy
@@ -194,7 +197,7 @@ def GetSuccessors(state, parent, goal, cells, proc_map):
             
             if abs(proc_map[(x,y)][GetDirection(goal, (x,y))[0]][0] - x) >= abs(goal[0] - x) :
                 successors.append((x, y))
-                continue             
+     #           continue             
             
     if dx != 0 and dy == 0:
         if (s[0] - goal[0]) * (state[0] - goal[0]) <= 0:
@@ -206,7 +209,7 @@ def GetSuccessors(state, parent, goal, cells, proc_map):
             
             if abs(proc_map[(x,y)][GetDirection(goal, (x,y))[0]][1] - y) >= abs(goal[1] - y) :
                 successors.append((x, y))
-                continue   
+      #          continue   
             
     if dy != 0 and dx == 0:
         if (s[1] - goal[1]) * (state[1] - goal[1]) <= 0: 
@@ -218,7 +221,7 @@ def GetSuccessors(state, parent, goal, cells, proc_map):
             
             if abs(proc_map[(x,y)][GetDirection(goal, (x,y))[0]][0] - x) >= abs(goal[0] - x):
                 successors.append((x, y))
-                continue
+      #          continue
      
     successors.append((s[0], s[1]))
     
