@@ -296,57 +296,51 @@ def SimpleTest(SearchFunction, height, width, mapstr, iStart, jStart, iGoal, jGo
         print("Execution error")
         print(e)
 
-def MassiveTest(SearchFunction, heuristicFunction = DiagonalDistance):
+def MassiveTest(SearchFunction, proc_maps, taskFileName, mapFileName, max_task=600, heuristicFunction = DiagonalDistance):
     stat = dict()
     stat["corr"] = []
     stat["len"] = []
     stat["nc"] = []
     stat["st"] = []
     
-    count = 0
-    for file in os.listdir("DragonAge/maps"):
-        if count > 1:
+    taskMap = Map()
+    width, height, cells = ReadMapFromMovingAIFile(mapFileName)
+    taskMap.SetGridCells(width,height,cells)
+    list_iStart, list_jStart, list_iGoal, list_jGoal, list_length = ReadTaskFromMovingAIFile(taskFileName)
+    assert len(list_iStart) == len(list_jStart) == len(list_iGoal) == len(list_jGoal)
+    task_count = 0
+    for i in range(len(list_iStart)):
+        if task_count > max_task:
             break
-        else:
-            print("NumberMap - ", count)
-        taskMap = Map()
-        taskFileName = str(file) + ".scen"
-        mapFileName = str(file)
-        width, height, cells = ReadMapFromMovingAIFile(mapFileName)
-        taskMap.SetGridCells(width,height,cells)
-        list_iStart, list_jStart, list_iGoal, list_jGoal, list_length = ReadTaskFromMovingAIFile(taskFileName)
-        assert len(list_iStart) == len(list_jStart) == len(list_iGoal) == len(list_jGoal)
-        for i in range(len(list_iStart)):
-            iStart = list_iStart[i]
-            jStart = list_jStart[i]
-            iGoal = list_iGoal[i]
-            jGoal = list_jGoal[i]
-            length = list_length[i]
-            count += 1
-            try:
-            #    print(iStart, jStart, iGoal, jGoal)
-             #   result = SearchFunction(taskMap, iStart, jStart, iGoal, jGoal, heuristicFunction)
-                result = SearchFunction(taskMap, iStart, jStart, iGoal, jGoal,heuristicFunction)
-                nodesExpanded = result[2]
-                nodesOpened = result[3]
-                if result[0]:
-                    path = MakePath(result[1]) 
-                    stat["len"].append(path[1])
-                    correct = abs(path[1] - length) < EPS
-                    stat["corr"].append(correct)
-                    
-                    print("Path found! Length: " + str(path[1]) + ". Nodes created: " + str(len(nodesOpened) + len(nodesExpanded)) + ". Number of steps: " + str(len(nodesExpanded)) + ". Correct: " + str(correct))
-                    print(path[1], length)
-                else:
-                    print("Path not found!")
-                    stat["corr"].append(False)
-                    stat["len"].append(0.0)
+        iStart = list_iStart[i]
+        jStart = list_jStart[i]
+        iGoal = list_iGoal[i]
+        jGoal = list_jGoal[i]
+        length = list_length[i]
+        proc_map = proc_maps[::-1].pop()
+        try:
 
-                stat["nc"].append(len(nodesOpened) + len(nodesExpanded))
-                stat["st"].append(len(nodesExpanded))
+            result = SearchFunction(taskMap, iStart, jStart, iGoal, jGoal,proc_map, heuristicFunction)
+            nodesExpanded = result[2]
+            nodesOpened = result[3]
+            if result[0]:
+                path = MakePath(result[1]) 
+                stat["len"].append(path[1])
+                correct = abs(path[1] - length) < EPS
+                stat["corr"].append(correct)
+                
+                print("Path found! Length: " + str(path[1]) + ". Nodes created: " + str(len(nodesOpened) + len(nodesExpanded)) + ". Number of steps: " + str(len(nodesExpanded)) + ". Correct: " + str(correct))
+                print(path[1], length)
+            else:
+                print("Path not found!")
+                stat["corr"].append(False)
+                stat["len"].append(0.0)
 
-            except Exception as e:
-                print("Execution error")
-                print(e)
+            stat["nc"].append(len(nodesOpened) + len(nodesExpanded))
+            stat["st"].append(len(nodesExpanded))
+
+        except Exception as e:
+            print("Execution error")
+            print(e)
 
     return stat

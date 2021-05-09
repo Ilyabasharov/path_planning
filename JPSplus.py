@@ -159,11 +159,13 @@ def GetNeighbours(state, parent, proc_map):
 
 def GetSuccessors(state, parent, goal, cells, proc_map):
   successors = []
+  '''
   if parent is not None:
     neighbours = GetNeighbours(state, parent, proc_map)
   else:
     neighbours = proc_map[state]
-  
+  '''
+  neighbours = proc_map[state]
   for d, s in enumerate(neighbours):
     if s is None or s == state:
         continue
@@ -183,7 +185,7 @@ def GetSuccessors(state, parent, goal, cells, proc_map):
                 successors.append((x, y))   
                 continue
             
-        elif (s[1] - goal[1]) * (state[1] - goal[1]) <= 0: 
+        if (s[1] - goal[1]) * (state[1] - goal[1]) <= 0: 
             x = state[0] + (goal[1] - state[1]) * dx * dy
             y = goal[1]
             if (x,y) == goal:
