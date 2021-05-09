@@ -49,9 +49,9 @@ class JPS(BaseSolver):
     ) -> list:
         
         optimal = self.prune.getOptimalDirections(state, goal)
-        diallow = self.getDisallowedDirections(state)
+        allow = self.getAllowedDirections(state)
         
-        recommend = optimal - diallow
+        recommend = optimal - allow
         
         successors = [
             self.getJumpPoint(state.i, state.j, delta[0], delta[1], goal, grid)
@@ -61,7 +61,7 @@ class JPS(BaseSolver):
         
         return successors
             
-    def getDisallowedDirections(
+    def getAllowedDirections(
         self,
         state: Node,
     ) -> set:

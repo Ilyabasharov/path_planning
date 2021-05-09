@@ -14,8 +14,8 @@ def getDirection(
 ) -> tuple:
     
     direction = (
-        signOfDifference(c1 - c2)
-        for c1, c2 in zip((i1, j1), (i2, j2))
+        signOfDifference(i1 - i2), 
+        signOfDifference(j1 - j2),
     )
     
     return direction

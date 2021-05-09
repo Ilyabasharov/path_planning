@@ -1,5 +1,6 @@
 from __future__ import annotations
 import itertools
+import collections
 from types import FunctionType
 
 from solver.base import BaseSolver
@@ -8,6 +9,8 @@ from solver.pruning.base import BasePruning
 
 from graph.node import Node
 from graph.grid import GridMap
+
+from utils.utils import getDirection
 
 
 class JPSPlus(JPS):
@@ -19,7 +22,73 @@ class JPSPlus(JPS):
     ) -> JPSPlus:
         
         super().__init__(h_func, prune)
+        
+    def addXdim2Goal_(
+        self,
+        i:    int,
+        j:    int,
+        dx:   int,
+        dy:   int,
+        p_i:  int,
+        p_j:  int,
+        g_i:  int,
+        g_j:  int,
+        data: list,
+    ) -> bool:
+        
+        if (i - g_i) * (p_i - g_i) <= 0:
+            x = g_i
+            y = (g_i - p_i) * dx * dy + p_j
+            
+            point = (x, y)
+            if x == g_i and y == g_j:
+                data.append(point)
+                return True
+                    
+            to_goal = getDirection(g_i, g_j, x, y)
+                    
+            if to_goal in self.jump_points[point]:
+                check_x, check_y = self.jump_points[point][to_goal]
+
+                if abs(check_y - y) >= abs(g_j - y):
+                    data.append(point)
+                    return False
+                
+        return None
     
+    def addYdim2Goal_(
+        self,
+        i:    int,
+        j:    int,
+        dx:   int,
+        dy:   int,
+        p_i:  int,
+        p_j:  int,
+        g_i:  int,
+        g_j:  int,
+        data: list,
+    ) -> bool:
+        
+        if (j - g_j) * (p_j - g_j) <= 0:
+            x = (g_j - p_j) * dx * dy + p_i
+            y = g_j
+            
+            point = (x, y)
+            if x == g_i and y == g_j:
+                data.append(point)
+                return True
+                    
+            to_goal = getDirection(g_i, g_j, x, y)
+                    
+            if to_goal in self.jump_points[point]:
+                check_x, check_y = self.jump_points[point][to_goal]
+
+                if abs(check_x - x) >= abs(g_i - x):
+                    data.append(point)
+                    return False
+                
+        return None
+
     def filteredSuccessors(
         self,
         state: Node,
@@ -28,45 +97,41 @@ class JPSPlus(JPS):
     ) -> list: 
         
         optimal = self.prune.getOptimalDirections(state, goal)
-        diallow = self.getDisallowedDirections(state)
+        allow = self.getAllowedDirections(state)
         
-        recommend = optimal - diallow
-        
-        successors = []
+        recommend = optimal - allow
         
         current = (state.i, state.j)
         
-        for edge in self.jump_points[current]:
+        base_successors = [
+            (self.jump_points[current][edge], edge)
+            for edge in self.jump_points[current]
+            if edge in recommend
+        ]
             
-            if edge not in recommend:
-                continue
-            
-            point = self.jump_points[current][edge]
+        forced_successors = []
+        
+        for (i, j), (dx, dy) in base_successors:
                 
-            if point is None:
-                continue
+             #diag
+            if dx != 0 and dy != 0:
                 
-            i, j = point
+                if self.addXdim2Goal_(i, j, dx, dy, state.i, state.j, goal.i, goal.j, forced_successors) or \
+                   self.addYdim2Goal_(i, j, dx, dy, state.i, state.j, goal.i, goal.j, forced_successors):
+                    break
+                    
+            #horisontal
+            elif dx == 0:
+                if self.addYdim2Goal_(i, j, dx, dy, state.i, state.j, goal.i, goal.j, forced_successors):
+                    break
+                    
+            else:
+                if self.addXdim2Goal_(i, j, dx, dy, state.i, state.j, goal.i, goal.j, forced_successors):
+                    break
+                        
+            forced_successors.append((i, j))
                 
-            if (i - goal.i) * (state.i - goal.i) <= 0 and \
-               (j - goal.j) * (state.j - goal.j) <= 0:
-                
-                successors.append((goal.i, goal.j))
-                break
-
-            if (i - goal.i) * (state.i - goal.i) <= 0:
-                if not grid.isObstacle(goal.i, j):
-                    successors.append((goal.i, j))
-
-            if (j - goal.j) * (state.j - goal.j) <= 0:
-                if not grid.isObstacle(i, goal.j):
-                    successors.append((i, goal.j))
-            
-            if (i - goal.i) * (state.i - goal.i) > 0 and \
-               (j - goal.j) * (state.j - goal.j) > 0:
-                successors.append((i, j))
-                
-        return successors
+        return forced_successors
         
     def getJumpPoint(
         self,
@@ -140,15 +205,20 @@ class JPSPlus(JPS):
         self,
         grid: GridMap,
     ) -> None:
+        
+        self.jump_points = collections.defaultdict(dict)
+        
+        for i, j in itertools.product(range(grid.height), range(grid.width)):
+            
+            point = (i, j)
+            
+            if grid.isObstacle(i, j):
+                continue
                 
-        self.jump_points = {
-            
-            (i, j): {
-                (dx, dy): self.getJumpPoint(i, j, dx, dy, grid)[0]
-                for dx, dy in grid.getAllowedMovements(i, j)
-            }
-            
-            for i, j in itertools.product(range(grid.height), range(grid.width))
-            if not grid.isObstacle(i, j)
-        }
+            for dx, dy in grid.getAllowedMovements(i, j):
+                
+                jp, _ = self.getJumpPoint(i, j, dx, dy, grid)
+                
+                if jp is not None:
+                    self.jump_points[point][(dx, dy)] = jp
         
