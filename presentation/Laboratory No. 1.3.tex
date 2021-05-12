@@ -1,5 +1,3 @@
-
-%\documentclass[a4paper, 12pt]{article}
 \documentclass{physlab}
 %%%%
 \usepackage[utf8]{inputenc}
@@ -19,6 +17,7 @@
 \usepackage{pgfplots}
 \usepackage{geometry}
 \usepackage{comment}
+\usepackage{hyperref}
 
 
 \graphicspath{{graphs/}}
@@ -29,16 +28,20 @@
 
 % объявляем новую команду для переноса строки внутри ячейки таблицы
 \newcommand{\specialcell}[2][l]{%
-  \begin{tabular}[#1]{@{}l@{}}#2\end{tabular}}
+	\begin{tabular}[#1]{@{}l@{}}#2\end{tabular}}
 \DeclareMathOperator*{\argmin}{arg\,min}
 
 \begin{document}
-
-%\include{main}
-\title{	Алгоритмы сокращения пространства поиска на графе регулярной декомпозиции за счет симметрии и смежных техник (JPS и его модификации).}
-\author{Трясогузов Павел, Башаров Илья}
-\date{\today}
-\maketitle
+	
+	\title{	Алгоритмы сокращения пространства поиска на графе регулярной декомпозиции за счет симметрии и смежных техник (JPS и его модификации). \\
+	
+	\href{https://github.com/Ilyabasharov/path_planning}{GitHub}.
+	
+}
+	\author{Трясогузов Павел, Башаров Илья}
+	\date{\today}
+	
+	\maketitle
 
 \tableofcontents % это оглавление, которое генерируется автоматически
 
@@ -147,46 +150,17 @@
 Главная проблема подхода - долгое время предподсчета. Необходиомо найти оптимальный путь от каждой вершины до каждой. Главным методом предподсчета будет являться алгоритм Дейкстры. Таким образом, общее время предподсчета составит $O(n^2logn)$, где $n$ - число узлов сетки.
 
 \section{Результаты экспериментальных исследований}
-Эксперименты проводились на двух картах Dragon Age из moving AI, карта №1 имеет размер 50 на 182 и 441 задания с длиннами пути от 1 до 172, карта №2 имеет размер 209 на 281, 911 заданий с длиннами путей от 1 до 363. Анализ времени выолнения для карты №1 представлен на рис. 6. На рис. 6а можно заметить, что для JPS дает улучшение времени работы в 1.8 раз по сравнению с алгоритмом Astar, в то время как алгоритм JPS+ сокращает время выполения значительно (в 10 раз по сравнению с JPS). На рис. 6б приведен приведен график для алгоритмов  с использованием прунинга, техника BBox уменьшает время работы алгоритмов Astar и JPS в 10 раз, в случае с JPS+ - в 1.5 раза.  
+Эксперименты проводились на двух картах Dragon Age из moving AI. Были выбраны легкие и сложные карты для тестирования для того, чтобы показать различия в работе алгоритмов. Основное отличие карт в количесве препятствий. Анализ времени выолнения для карты №1 представлен на рис. 6. На рис. 6а можно заметить, что для JPS дает улучшение времени работы в 1.8 раз по сравнению с алгоритмом Astar, в то время как алгоритм JPS+ сокращает время выполения значительно (в 10 раз по сравнению с JPS). На рис. 6б приведен приведен график для алгоритмов  с использованием прунинга, техника BBox уменьшает время работы алгоритмов Astar и JPS в 10 раз, в случае с JPS+ - в 1.5 раза.  
 \begin{figure}[H]
-\begin{minipage}[h]{0.55\linewidth}
-\center{\includegraphics[width=0.93\linewidth]{1Time1.jpg} \\}
-\subcaption{Время выполнения алгоритмов Astar, JPS и JPS+}
-\end{minipage}
-\hfill
-\begin{minipage}[h]{0.52\linewidth}
-\center{\includegraphics[width=1.\linewidth]{1Time2.jpg} \\}
-\subcaption{Время выполнения алгоритмов Astar, JPS и JPS+ с использованием прунинга}
-\end{minipage}
+	\includegraphics[width=0.93\linewidth]{error.pdf}
 \caption{Время выполения для карты № 1.}
 \end{figure} 
 На рис. 7 представлены графики зависимости длины пути от времени. Как можно заметить алгоритм JPS+ наименее чувствителен к росту длины пути на данных картах. 
 \begin{figure}[H]
-\begin{minipage}[h]{0.55\linewidth}
-\center{\includegraphics[width=0.93\linewidth]{TimeLength1.jpg} \\}
-\subcaption{График зависимости длины пути от времени для алгоритмов Astar, JPS и JPS+}
-\end{minipage}
-\hfill
-\begin{minipage}[h]{0.52\linewidth}
-\center{\includegraphics[width=1.\linewidth]{TimeLength2.jpg} \\}
-\subcaption{График зависимости длины пути от времени для алгоритмов Astar, JPS и JPS+ с использованием прунинга}
-\end{minipage}
-\caption{}
+	\includegraphics[width=0.93\linewidth]{comparison.pdf}
+\caption{Зависимость среднего времени и количества нодов от сложности задания}
 \end{figure} 
 
-
-\begin{figure}[H] 
-\centering
-    \includegraphics[width=0.7\linewidth]{2Time1.jpg}
-    \caption{Время выполнения алгоритмов Astar, JPS и JPS+}
-\end{figure}
-
-
-\begin{figure}[H] 
-\centering
-    \includegraphics[width=0.55\linewidth]{1NodesCreated.png}
-    \caption{Среднее значение числа вершин созданных вершин для исследуемых алгоритмов}
-\end{figure}
 
 
 \section{Литература}
