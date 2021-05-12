@@ -9,14 +9,14 @@ class BasePruning:
     
     def __init__(
         self,
-    ) -> BasePrune:
+    ) -> BasePruning:
         
         self.preprocessed = False
     
     def preprocess(
         self,
         forcedDirections: FunctionType,
-        grid: GridMap,
+        grid:             GridMap,
     ) -> None:
         
         pass
@@ -41,7 +41,7 @@ class NoPruning(BasePruning):
     def preprocess(
         self,
         forcedDirections: FunctionType,
-        grid: GridMap,
+        grid:             GridMap,
     ) -> None:
         
         self.allowed_directions = set(grid.deltas)
