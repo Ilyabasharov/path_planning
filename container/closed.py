@@ -12,31 +12,29 @@ class ClosedList(ClosedBase):
         super().__init__()
         
         self.elements_set  = set()
-        self.elements_list = list()
 
     def __iter__(
         self,
     ) -> iter:
         
-        return iter(self.elements_list)
+        return iter(self.elements_set)
     
     def __len__(
         self,
     ) -> int:
         
-        return len(self.elements_list)
+        return len(self.elements_set)
     
     def addNode(
         self,
         item: Node,
     ) -> None:
         
-        self.elements_set.add((item.i, item.j))
-        self.elements_list.append(item)
+        self.elements_set.add(item)
 
     def wasExpanded(
         self,
         item: Node,
     ) -> bool:
         
-        return (item.i, item.j) in self.elements_set
+        return item in self.elements_set

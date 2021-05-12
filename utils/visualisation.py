@@ -20,6 +20,8 @@ def drawResult(
     closed_list: ClosedBase  = None,
     open_list:   OpenBase    = None,
     draw_cost:   bool        = False,
+    save:        bool        = False,
+    plot:        bool        = True,
 ) -> None:
     
     def getRectangle(
@@ -30,7 +32,7 @@ def drawResult(
         
         return [j * k, i * k, (j + 1) * k - 1, (i + 1) * k - 1]
     
-    k    = 40
+    k    = 20
     hIm  = grid.height * k
     wIm  = grid.width * k
     im   = Image.new('RGB', (wIm, hIm), color = 'white')
@@ -43,12 +45,12 @@ def drawResult(
                 fill = (70, 80, 80),
             )
                 
-    for container, color in zip((open_list,       closed_list    ),
+    for nodes, color in zip((open_list,       closed_list    ),
                                 ((213, 219, 219), (131, 145, 146))):
-        if container is not None:
-            for node in container:
+        if nodes is not None:
+            for node in nodes:
                 draw.rectangle(
-                    xy    =  getRectangle(node.i, node.j, k),
+                    xy    = getRectangle(node.i, node.j, k),
                     fill  = color,
                     width = 0,
                 )
@@ -73,11 +75,14 @@ def drawResult(
     for keypoint, color in zip((start,         goal         ),
                                ((40, 180, 99), (231, 76, 60))):
 
-        if keypoint is not None and not grid.isObstacle(keypoint.i, keypoint.j):
+        if keypoint is not None:
             draw.rectangle(
                 xy    = getRectangle(keypoint.i, keypoint.j, k),
                 fill  = color, 
                 width = 0,
             )
+    if plot:
+        display(im)
     
-    display(im)
+    if save:
+        im.save(f'images/{start.i}_{start.j}|{goal.i}_{goal.j}.png')

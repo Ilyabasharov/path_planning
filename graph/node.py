@@ -17,6 +17,8 @@ class Node:
         self.i = i
         self.j = j
         
+        self.tuple = (i, j)
+        
         if parent is not None:
             self.g = parent.g + euclidDistance(parent.i, parent.j, i, j)
         else:
@@ -33,14 +35,9 @@ class Node:
         other: Node,
     ) -> bool:
         
-        if isinstance(other, (tuple, list)):
-            return self.i == other[0] and \
-                   self.j == other[1]
-        
         return self.i == other.i and \
                self.j == other.j
         
-
     def __lt__(
         self,
         other: Node,
@@ -49,3 +46,9 @@ class Node:
         return (self.f <  other.f) \
             or (self.f == other.f and self.h <  other.h) \
             or (self.f == other.f and self.h == other.h and self.k > other.k)
+    
+    def __hash__(
+        self
+    ) -> int:
+        
+        return hash(self.tuple)

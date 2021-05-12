@@ -44,7 +44,7 @@ class JPSPlus(JPS):
             if x == g_i and y == g_j:
                 data.append(point)
                 return True
-                    
+            
             to_goal = getDirection(g_i, g_j, x, y)
                     
             if to_goal in self.jump_points[point]:
@@ -77,7 +77,7 @@ class JPSPlus(JPS):
             if x == g_i and y == g_j:
                 data.append(point)
                 return True
-                    
+            
             to_goal = getDirection(g_i, g_j, x, y)
                     
             if to_goal in self.jump_points[point]:
@@ -208,17 +208,15 @@ class JPSPlus(JPS):
         
         self.jump_points = collections.defaultdict(dict)
         
-        for i, j in itertools.product(range(grid.height), range(grid.width)):
+        for node in itertools.product(range(grid.height), range(grid.width)):
             
-            point = (i, j)
-            
-            if grid.isObstacle(i, j):
+            if grid.isObstacle(node[0], node[1]):
                 continue
                 
-            for dx, dy in grid.getAllowedMovements(i, j):
+            for edge in grid.getAllowedMovements(node[0], node[1]):
                 
-                jp, _ = self.getJumpPoint(i, j, dx, dy, grid)
+                jp, _ = self.getJumpPoint(node[0], node[1], edge[0], edge[1], grid)
                 
                 if jp is not None:
-                    self.jump_points[point][(dx, dy)] = jp
+                    self.jump_points[node][edge] = jp
         

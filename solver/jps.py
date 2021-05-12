@@ -76,7 +76,7 @@ class JPS(BaseSolver):
         
         #diag
         if dx != 0 and dy != 0:
-            directions |= {
+            directions = {
                 (dx, dy),
                 (dx,  0),
                 ( 0, dy),
@@ -84,7 +84,7 @@ class JPS(BaseSolver):
         
         #horisontal
         elif dx == 0:
-            directions |= {
+            directions = {
                 (dx, dy),
                 (+1,  0),
                 (-1,  0),
@@ -93,7 +93,7 @@ class JPS(BaseSolver):
             }
         #vertical
         else:
-            directions |= {
+            directions = {
                 (dx, dy),
                 ( 0, +1),
                 ( 0, -1),
@@ -160,8 +160,8 @@ class JPS(BaseSolver):
         
         base_x, base_y = i + dx, j + dy
         
-        if (base_x, base_y) == goal:
-            return (base_x, base_y)
+        if base_x == goal.i and base_y == goal.j:
+            return base_x, base_y
         
         x, y = base_x, base_y
         
@@ -182,36 +182,36 @@ class JPS(BaseSolver):
                 x += dx
                 y += dy
                 
-                if (x, y) == goal:
-                    return (x, y)
+                if x == goal.i and y == goal.j:
+                    return x, y
         #horisontal
         elif dx == 0:
             
             while True:
                 if self.isHorisontalJumpPoint(base_x, y, dx, dy, grid):
-                    return (base_x, y)
+                    return base_x, y
                 
                 if not grid.traversable(base_x, y, dx, dy):
                     return None
                 
                 y += dy
                 
-                if (base_x, y) == goal:
-                    return (base_x, y)
+                if base_x == goal.i and y == goal.j:
+                    return base_x, y
         #vertical       
         else:
             
             while True:
                 if self.isVerticalJumpPoint(x, base_y, dx, dy, grid):
-                    return (x, base_y)
+                    return x, base_y
                 
                 if not grid.traversable(x, base_y, dx, dy):
                     return None
                 
                 x += dx
                 
-                if (x, base_y) == goal:
-                    return (x, base_y)
+                if x == goal.i and base_y == goal.j:
+                    return x, base_y
                 
     def getForsedDirections(
         self,
@@ -227,18 +227,17 @@ class JPS(BaseSolver):
          #diag
         if dx != 0 and dy != 0:
             
-            for e_dx, e_dy in [(dx, 0), (0, dy)]:
+            for edge in [(dx, 0), (0, dy)]:
                 
-                if grid.traversable(iState, jState, e_dx, e_dy):
-                    forced.append((e_dx, e_dy))
+                if grid.traversable(iState, jState, edge[0], edge[1]):
+                    forced.append(edge)
                 
-                f_dx = dx - 2*e_dx
-                f_dy = dy - 2*e_dy
+                f_edge = (dx - 2*edge[0], dy - 2*edge[1])
                 
-                if not grid.traversable(iState, jState, -e_dx, -e_dy) \
-                   and grid.traversable(iState, jState, +f_dx, +f_dy):
+                if not grid.traversable(iState, jState, -edge[0],   -edge[1]  ) \
+                   and grid.traversable(iState, jState, +f_edge[0], +f_edge[1]):
                     
-                    forced.append((f_dx, f_dy))
+                    forced.append(f_edge)
                     
         #horisontal
         elif dx == 0:

@@ -2,9 +2,11 @@ from graph.node import Node
 
 def makePath(
     goal: Node,
-) -> tuple:
+) -> list:
     
-    length = goal.g
+    if goal is None:
+        return None
+    
     current = goal
     path = []
     while current.parent:
@@ -12,11 +14,14 @@ def makePath(
         current = current.parent
     path.append(current)
     
-    return path[::-1], length
+    return path[::-1]
 
 def getLastEdge(
     goal: Node,
 ) -> tuple:
+    
+    if goal is None:
+        return None
     
     current = goal
     prev    = goal

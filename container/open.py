@@ -7,6 +7,7 @@ from heapq import (
 from container.base import OpenBase
 from graph.node import Node
 
+
 class OpenList(OpenBase):
     
     def __init__(
@@ -22,14 +23,15 @@ class OpenList(OpenBase):
         self,
     ) -> iter:
         
-        return iter(self.ij_to_node.values())
+        for key in self.ij_to_node:
+            yield self.ij_to_node[key]
 
     def __len__(
         self,
     ) -> int:
         
         return len(self.ij_to_node)
-
+    
     def addNode(
         self,
         item: Node,
@@ -41,7 +43,7 @@ class OpenList(OpenBase):
         if oldNode is None or item.g < oldNode.g:
             self.ij_to_node[ij] = item
             heappush(self.prioritizedQueue, item)
-
+    
     def getBestNode(
         self,
     ) -> Node:
