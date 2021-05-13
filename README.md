@@ -21,7 +21,7 @@ p.s. pruning algorithm can be applied for each solvers.
 from solver.jpsplus import JPSPlus             #define the solver
 from solver.pruning.bbox import BBoxPruning    #define pruning
 from utils.distance import diagonalDistance    #define h function
-from solver.base import findPathBase            #define search function
+from solver.base import findPathBase           #define search function
 from graph.node import Node                    #define Node for start/finish
 from graph.grid import GridMap                 #define occupancy grid map via string
 from evaluation.test import simpleTest         #define eval function
