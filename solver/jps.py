@@ -158,68 +158,59 @@ class JPS(BaseSolver):
         if not grid.traversable(i, j, dx, dy):
             return None
         
-        base_x, base_y = i + dx, j + dy
+        x, y = i + dx, j + dy
         
-        if base_x == goal.i and base_y == goal.j:
-            return base_x, base_y
+        if x == goal.i and y == goal.j:
+            return x, y
         
-        x, y = base_x, base_y
+        while True:
+            
+            if self.checkJumpPoint(x, y, dx, dy, grid):
+                return x, y
+            
+            #diag
+            if dx != 0 and dy != 0:
+                for e_dx, e_dy in [(dx, 0), (0, dy)]:
+                    if self.getJumpPoint(x, y, e_dx, e_dy, goal, grid) is not None:
+                        return x, y
+                    
+            if not grid.traversable(x, y, dx, dy):
+                return None
+
+            x += dx
+            y += dy
+            
+            if x == goal.i and y == goal.j:
+                return x, y
+                
+    def checkJumpPoint(
+        self,
+        i:    int,
+        j:    int,
+        dx:   int,
+        dy:   int,
+        grid: GridMap,
+    ) -> list:
         
-        #diag
         if dx != 0 and dy != 0:
-            
-            while True:
-                if self.isDiagonalJumpPoint(x, y, dx, dy, grid):
-                    return (x, y)
-                
-                if self.getJumpPoint(x, y, dx,  0, goal, grid) is not None or \
-                   self.getJumpPoint(x, y,  0, dy, goal, grid) is not None :
-                    return (x, y)
-                
-                if not grid.traversable(x, y, dx, dy):
-                    return None
-                
-                x += dx
-                y += dy
-                
-                if x == goal.i and y == goal.j:
-                    return x, y
-        #horisontal
+            return self.isDiagonalJumpPoint(i, j, dx, dy, grid)
+        
         elif dx == 0:
-            
-            while True:
-                if self.isHorisontalJumpPoint(base_x, y, dx, dy, grid):
-                    return base_x, y
-                
-                if not grid.traversable(base_x, y, dx, dy):
-                    return None
-                
-                y += dy
-                
-                if base_x == goal.i and y == goal.j:
-                    return base_x, y
-        #vertical       
-        else:
-            
-            while True:
-                if self.isVerticalJumpPoint(x, base_y, dx, dy, grid):
-                    return x, base_y
-                
-                if not grid.traversable(x, base_y, dx, dy):
-                    return None
-                
-                x += dx
-                
-                if x == goal.i and base_y == goal.j:
-                    return x, base_y
+            return self.isHorisontalJumpPoint(i, j, dx, dy, grid)
+        
+        elif dy == 0:
+            return self.isVerticalJumpPoint(i, j, dx, dy, grid)
+                    
+        return False
+    
                 
     def getForsedDirections(
         self,
-        iState: int,
-        jState: int,
-        dx:     int,
-        dy:     int,
-        grid:   GridMap,
+        i:    int,
+        j:    int,
+        dx:   int,
+        dy:   int,
+        grid: GridMap,
     ) -> list:
         
         forced = []
@@ -229,13 +220,13 @@ class JPS(BaseSolver):
             
             for edge in [(dx, 0), (0, dy)]:
                 
-                if grid.traversable(iState, jState, edge[0], edge[1]):
+                if grid.traversable(i, j, edge[0], edge[1]):
                     forced.append(edge)
                 
                 f_edge = (dx - 2*edge[0], dy - 2*edge[1])
                 
-                if not grid.traversable(iState, jState, -edge[0],   -edge[1]  ) \
-                   and grid.traversable(iState, jState, +f_edge[0], +f_edge[1]):
+                if not grid.traversable(i, j, -edge[0],   -edge[1]  ) \
+                   and grid.traversable(i, j, +f_edge[0], +f_edge[1]):
                     
                     forced.append(f_edge)
                     
@@ -244,8 +235,8 @@ class JPS(BaseSolver):
             
             for e_dx in [1, -1]:
                 
-                if not grid.traversable(iState, jState, e_dx, +0) \
-                   and grid.traversable(iState, jState, e_dx, dy):
+                if not grid.traversable(i, j, e_dx, +0) \
+                   and grid.traversable(i, j, e_dx, dy):
                     
                     forced.append((e_dx, dy))
                     
@@ -254,8 +245,8 @@ class JPS(BaseSolver):
             
             for e_dy in [1, -1]:
                 
-                if not grid.traversable(iState, jState, +0, e_dy) \
-                   and grid.traversable(iState, jState, dx, e_dy):
+                if not grid.traversable(i, j, +0, e_dy) \
+                   and grid.traversable(i, j, dx, e_dy):
                     
                     forced.append((dx, e_dy))
                     
