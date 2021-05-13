@@ -143,52 +143,26 @@ class JPSPlus(JPS):
     ) -> tuple:
         
         if not grid.traversable(i, j, dx, dy):
-            return None, False
+            return (i, j), False
         
-        base_x, base_y = i + dx, j + dy
+        x, y = i + dx, j + dy
         
-        x, y = base_x, base_y
-        
-        #diag
-        if dx != 0 and dy != 0:
+        while True:
             
-            while True:
-                if self.isDiagonalJumpPoint(x, y, dx, dy, grid):
-                    return (x, y), True
-                
-                if self.getJumpPoint(x, y, dx,  0, grid)[1] or \
-                   self.getJumpPoint(x, y,  0, dy, grid)[1] :
-                    return (x, y), True
-                
-                if not grid.traversable(x, y, dx, dy):
-                    return (x, y), False
-                
-                x += dx
-                y += dy
-                
-        #horisontal
-        elif dx == 0:
+            if self.checkJumpPoint(x, y, dx, dy, grid):
+                return (x, y), True
             
-            while True:
-                if self.isHorisontalJumpPoint(base_x, y, dx, dy, grid):
-                    return (base_x, y), True
-                
-                if not grid.traversable(base_x, y, dx, dy):
-                    return (base_x, y), False
-                
-                y += dy
-                
-        #vertical       
-        else:
-            
-            while True:
-                if self.isVerticalJumpPoint(x, base_y, dx, dy, grid):
-                    return (x, base_y), True
-                
-                if not grid.traversable(x, base_y, dx, dy):
-                    return (x, base_y), False
-                
-                x += dx
+            #diag
+            if dx != 0 and dy != 0:
+                for e_dx, e_dy in [(dx, 0), (0, dy)]:
+                    if self.getJumpPoint(x, y, e_dx, e_dy, grid)[1]:
+                        return (x, y), True
+                    
+            if not grid.traversable(x, y, dx, dy):
+                return (x, y), False
+
+            x += dx
+            y += dy
         
     def doPreprocess(
         self,
